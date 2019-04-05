@@ -29,12 +29,10 @@ func Run(args ...string) (string, error) {
 	var cmd = exec.Command("git", args...)
 	log.WithField("args", args).Debug("running git")
 	bts, err := cmd.CombinedOutput()
-	log.WithField("output", string(bts)).
-		Debug("git result")
+	log.WithField("output", string(bts)).Debug("git result")
 	if err != nil {
 		return "", errors.New(strings.TrimSuffix(string(bts), "\n"))
 	}
 
-	output := strings.Replace(strings.Split(string(bts), "\n")[0], "'", "", -1)
-	return output, nil
+	return strings.TrimSuffix(string(bts), "\n"), nil
 }

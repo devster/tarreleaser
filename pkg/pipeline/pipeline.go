@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/devster/tarreleaser/pkg/context"
 	pkglog "github.com/devster/tarreleaser/pkg/log"
+	"github.com/devster/tarreleaser/pkg/pipe/archive"
 	"github.com/devster/tarreleaser/pkg/pipe/dist"
 	"github.com/devster/tarreleaser/pkg/pipe/gitinfo"
 )
@@ -11,6 +12,7 @@ import (
 var Pipes = []Pipe{
 	gitinfo.Pipe{},
 	dist.Pipe{},
+	archive.Pipe{},
 }
 
 type Pipe interface {

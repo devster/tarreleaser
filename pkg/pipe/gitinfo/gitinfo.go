@@ -89,19 +89,19 @@ func getInfo() (context.GitInfo, error) {
 }
 
 func getShortCommit() (string, error) {
-	return git.Run("show", "--format='%h'", "HEAD", "-q")
+	return git.Run("show", "--format=%h", "HEAD", "-q")
 }
 
 func getFullCommit() (string, error) {
-	return git.Run("show", "--format='%H'", "HEAD", "-q")
+	return git.Run("show", "--format=%H", "HEAD", "-q")
 }
 
 func getAuthor() (string, error) {
-	return git.Run("show", "--format='%aN'", "HEAD", "-q")
+	return git.Run("show", "--format=%aN", "HEAD", "-q")
 }
 
 func getMessage() (string, error) {
-	return git.Run("show", "--format='%s'", "HEAD", "-q")
+	return git.Run("show", "--format=%s", "HEAD", "-q")
 }
 
 func getTag() (string, error) {

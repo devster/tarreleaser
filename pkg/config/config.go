@@ -8,8 +8,10 @@ import (
 )
 
 type Archive struct {
-	CompressionLevel int `yaml:",omitempty"`
+	Name string `yaml:",omitempty"`
+	CompressionLevel int `yaml:"compression_level,omitempty"`
 	IncludeFiles []string `yaml:"includes,omitempty"`
+	ExcludeFiles []string `yaml:"excludes,omitempty"`
 }
 
 type Project struct {
