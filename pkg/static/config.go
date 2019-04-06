@@ -11,3 +11,9 @@ archive:
 publish:
 
 `
+
+const DefaultReleaseFileContent = `Date: {{ .Date }}
+Tag: {{ .Tag }}
+Commit: {{ .FullCommit }}
+Commit info: {{ .Commit.Message }} - {{ .Commit.Author }}
+`

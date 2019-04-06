@@ -17,3 +17,7 @@ test:
 cover: test
 	go tool cover -html=coverage.txt
 .PHONY: cover
+
+fmt:
+	go fmt ./...
+.PHONY: fmt

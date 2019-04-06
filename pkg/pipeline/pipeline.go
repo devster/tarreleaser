@@ -7,12 +7,14 @@ import (
 	"github.com/devster/tarreleaser/pkg/pipe/archive"
 	"github.com/devster/tarreleaser/pkg/pipe/dist"
 	"github.com/devster/tarreleaser/pkg/pipe/gitinfo"
+	"github.com/devster/tarreleaser/pkg/pipe/s3"
 )
 
 var Pipes = []Pipe{
 	gitinfo.Pipe{},
 	dist.Pipe{},
 	archive.Pipe{},
+	s3.Pipe{},
 }
 
 type Pipe interface {

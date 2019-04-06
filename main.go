@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/caarlos0/ctrlc"
 	"github.com/devster/tarreleaser/pkg/config"
 	"github.com/devster/tarreleaser/pkg/context"
 	pkglog "github.com/devster/tarreleaser/pkg/log"
@@ -11,6 +12,7 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 	"io/ioutil"
 	"os"
+	"time"
 )
 
 var (
@@ -20,9 +22,9 @@ var (
 const defaultConfigFile = ".tarreleaser.yml"
 
 type releaseOptions struct {
-	Config       string
-	SkipPublish  bool
-	RmDist       bool
+	Config      string
+	SkipPublish bool
+	Timeout     time.Duration
 }
 
 func init() {
@@ -30,8 +32,6 @@ func init() {
 }
 
 func main() {
-	//defer fmt.Println()
-
 	// Cli app
 	app := kingpin.New("tarreleaser", "Build and publish your app as tarball")
 	app.Version(fmt.Sprintf("%v", version))
@@ -44,6 +44,7 @@ func main() {
 	releaseCmd := app.Command("release", "Releases the current project").Default()
 	releaseCmd.Flag("config", "Load configuration from file").Short('c').Default(defaultConfigFile).StringVar(&rOptions.Config)
 	releaseCmd.Flag("skip-publish", "Skips publishing artifacts").Short('s').BoolVar(&rOptions.SkipPublish)
+	releaseCmd.Flag("timeout", "Timeout to the entire release process").Default("30m").DurationVar(&rOptions.Timeout)
 
 	// Init config file cli command
 	initCmd := app.Command("init", fmt.Sprintf("Generate a %v file", defaultConfigFile))
@@ -61,8 +62,9 @@ func main() {
 	switch cmd {
 	case releaseCmd.FullCommand():
 		log.WithFields(log.Fields{
-			"config": rOptions.Config,
+			"config":       rOptions.Config,
 			"skip-publish": rOptions.SkipPublish,
+			"timeout":      rOptions.Timeout,
 		}).Infof("releasing using tarreleaser %s...", version)
 
 		if err := releaseProject(rOptions); err != nil {
@@ -86,18 +88,13 @@ func releaseProject(options releaseOptions) error {
 		log.WithError(err).Fatal("failed to load config")
 	}
 
-	ctx := context.New(cfg)
+	ctx, cancel := context.NewWithTimeout(cfg, options.Timeout)
+	defer cancel()
+	ctx.SkipPublish = options.SkipPublish
 
-	if err := pipeline.Run(ctx); err != nil {
-		return err
-	}
-	// 1. Gathering data from project: hash commit, last tag, last commit message etc
-	// 2. Build the tar
-	// https://gist.github.com/jonmorehouse/9060515
-	// 3. Generate a checksum file
-	// 4. Publish
-
-	return nil
+	return ctrlc.Default.Run(ctx, func() error {
+		return pipeline.Run(ctx)
+	})
 }
 
 func initProject(filename string) error {

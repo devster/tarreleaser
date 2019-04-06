@@ -1,3 +1,4 @@
 tarreleaser
+.tarreleaser.yml
 coverage.txt
 dist/

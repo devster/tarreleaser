@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-type Pipe struct {}
+type Pipe struct{}
 
 func (Pipe) String() string {
 	return "dist"

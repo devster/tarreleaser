@@ -4,15 +4,18 @@ import (
 	"fmt"
 	"github.com/devster/tarreleaser/pkg/context"
 	"github.com/devster/tarreleaser/pkg/git"
-	"github.com/devster/tarreleaser/pkg/pipe"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
 
-type Pipe struct {pipe.NoDefault}
+type Pipe struct{}
 
 func (Pipe) String() string {
 	return "gitinfo"
+}
+
+func (Pipe) Default(ctx *context.Context) error {
+	return nil
 }
 
 func (Pipe) Run(ctx *context.Context) error {
@@ -35,7 +38,7 @@ func (Pipe) Run(ctx *context.Context) error {
 
 	ctx.Git = gitinfo
 	log.WithFields(log.Fields{
-		"tag": gitinfo.CurrentTag,
+		"tag":    gitinfo.CurrentTag,
 		"branch": gitinfo.Branch,
 		"commit": fmt.Sprintf("%s %s - %s", gitinfo.ShortCommit, gitinfo.Commit.Author, gitinfo.Commit.Message),
 	}).Info("git info")
@@ -76,11 +79,11 @@ func getInfo() (context.GitInfo, error) {
 
 	gitinfo := context.GitInfo{
 		ShortCommit: short,
-		FullCommit: full,
-		CurrentTag: tag,
-		Branch: branch,
+		FullCommit:  full,
+		CurrentTag:  tag,
+		Branch:      branch,
 		Commit: context.GitInfoCommit{
-			Author: author,
+			Author:  author,
 			Message: msg,
 		},
 	}

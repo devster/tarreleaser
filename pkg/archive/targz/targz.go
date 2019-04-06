@@ -6,6 +6,7 @@ import (
 	"compress/gzip"
 	"io"
 	"os"
+	"time"
 )
 
 // Archive as tar.gz
@@ -23,13 +24,13 @@ func (a Archive) Close() error {
 }
 
 // New tar.gz archive
-func New(target io.Writer, level int) (Archive, error) {
+func New(target io.Writer, level int) (*Archive, error) {
 	gw, err := gzip.NewWriterLevel(target, level)
 	if err != nil {
-		return Archive{}, err
+		return &Archive{}, err
 	}
 	tw := tar.NewWriter(gw)
-	return Archive{
+	return &Archive{
 		gw: gw,
 		tw: tw,
 	}, nil
@@ -37,11 +38,11 @@ func New(target io.Writer, level int) (Archive, error) {
 
 // Add file to the archive
 func (a Archive) Add(name, path string) error {
-	file, err := os.Open(path) // #nosec
+	file, err := os.Open(path)
 	if err != nil {
 		return err
 	}
-	defer file.Close() // nolint: errcheck
+	defer file.Close()
 	info, err := file.Stat()
 	if err != nil {
 		return err
@@ -58,5 +59,21 @@ func (a Archive) Add(name, path string) error {
 		return nil
 	}
 	_, err = io.Copy(a.tw, file)
+	return err
+}
+
+// Add file from content to the archive
+func (a Archive) AddFromString(name, content string) error {
+	header := new(tar.Header)
+	header.Name = name
+	header.Size = int64(len(content))
+	header.Mode = 0644
+	header.ModTime = time.Now()
+
+	if err := a.tw.WriteHeader(header); err != nil {
+		return err
+	}
+
+	_, err := a.tw.Write([]byte(content))
 	return err
 }
