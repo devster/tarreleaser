@@ -1,3 +1,4 @@
+dist: goreleaser-dist
 env:
   - GO111MODULE=on
   - GOPROXY=https://gocenter.io
