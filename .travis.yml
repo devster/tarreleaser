@@ -1,0 +1,7 @@
+dist: trusty
+language: go
+go: '1.12.x'
+script:
+  - make build
+  - make test
+  - ./tarreleaser --skip-publish --debug
