@@ -2,16 +2,17 @@ package gitinfo
 
 import (
 	"fmt"
+	"github.com/apex/log"
 	"github.com/devster/tarreleaser/pkg/context"
 	"github.com/devster/tarreleaser/pkg/git"
+	"github.com/devster/tarreleaser/pkg/pipe"
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 )
 
 type Pipe struct{}
 
 func (Pipe) String() string {
-	return "gitinfo"
+	return "gathering git info"
 }
 
 func (Pipe) Default(ctx *context.Context) error {
@@ -19,16 +20,12 @@ func (Pipe) Default(ctx *context.Context) error {
 }
 
 func (Pipe) Run(ctx *context.Context) error {
-	log.Info("gathering git repository infos")
-
 	if !git.HasGit() {
-		log.Warn("git not found in PATH, skipping")
-		return nil
+		return pipe.Skip("git not found in PATH, skipping")
 	}
 
 	if !git.IsRepo() {
-		log.Warn("current dir is not a git repository, skipping")
-		return nil
+		return pipe.Skip("current dir is not a git repository, skipping")
 	}
 
 	gitinfo, err := getInfo()

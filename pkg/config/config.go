@@ -2,7 +2,7 @@ package config
 
 import (
 	"fmt"
-	log "github.com/sirupsen/logrus"
+	"github.com/apex/log"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 )
@@ -40,6 +40,8 @@ type Project struct {
 }
 
 func Load(file string) (config Project, err error) {
+	log.WithField("file", file).Info("loading config file")
+
 	cfgYml, err := ioutil.ReadFile(file)
 	if err != nil {
 		return config, err

@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
+	"github.com/apex/log"
+	"github.com/apex/log/handlers/cli"
 	"github.com/caarlos0/ctrlc"
 	"github.com/devster/tarreleaser/pkg/config"
 	"github.com/devster/tarreleaser/pkg/context"
-	pkglog "github.com/devster/tarreleaser/pkg/log"
 	"github.com/devster/tarreleaser/pkg/pipeline"
 	"github.com/devster/tarreleaser/pkg/static"
-	log "github.com/sirupsen/logrus"
+	"github.com/fatih/color"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"io/ioutil"
 	"os"
@@ -17,6 +18,8 @@ import (
 
 var (
 	version = "dev"
+	commit  = "none"
+	date    = "unknown"
 )
 
 const defaultConfigFile = ".tarreleaser.yml"
@@ -27,14 +30,12 @@ type releaseOptions struct {
 	Timeout     time.Duration
 }
 
-func init() {
-	log.SetFormatter(pkglog.TextFormatter)
-}
-
 func main() {
+	log.SetHandler(cli.Default)
+
 	// Cli app
 	app := kingpin.New("tarreleaser", "Build and publish your app as tarball")
-	app.Version(fmt.Sprintf("%v", version))
+	app.Version(fmt.Sprintf("%v, commit %v, built at %v", version, commit, date))
 	app.HelpFlag.Short('h')
 	debug := app.Flag("debug", "Enable debug mode").Bool()
 	quiet := app.Flag("quiet", "Enable silent mode (only display errors)").Short('q').Bool()
@@ -61,17 +62,13 @@ func main() {
 
 	switch cmd {
 	case releaseCmd.FullCommand():
-		log.WithFields(log.Fields{
-			"config":       rOptions.Config,
-			"skip-publish": rOptions.SkipPublish,
-			"timeout":      rOptions.Timeout,
-		}).Infof("releasing using tarreleaser %s...", version)
+		start := time.Now()
+		log.Infof(color.New(color.Bold).Sprintf("releasing using tarreleaser %s...", version))
 
 		if err := releaseProject(rOptions); err != nil {
-			log.WithError(err).Fatal("release failed")
+			log.WithError(err).Fatalf(color.New(color.Bold).Sprintf("release failed after %0.2fs", time.Since(start).Seconds()))
 		}
-
-		log.Info("release succeeded")
+		log.Infof(color.New(color.Bold).Sprintf("release succeeded after %0.2fs", time.Since(start).Seconds()))
 
 	case initCmd.FullCommand():
 		if err := initProject(defaultConfigFile); err != nil {

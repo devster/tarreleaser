@@ -1,15 +1,17 @@
 package dist
 
 import (
+	"fmt"
+	"github.com/apex/log"
 	"github.com/devster/tarreleaser/pkg/context"
-	log "github.com/sirupsen/logrus"
+	"github.com/devster/tarreleaser/pkg/pipe"
 	"os"
 )
 
 type Pipe struct{}
 
 func (Pipe) String() string {
-	return "dist"
+	return "checking dist"
 }
 
 func (Pipe) Default(ctx *context.Context) error {
@@ -24,8 +26,8 @@ func (Pipe) Run(ctx *context.Context) error {
 	_, err := os.Stat(ctx.Config.Dist)
 	if os.IsNotExist(err) {
 		log.WithField("path", ctx.Config.Dist).Info("creating dist directory")
-		err = os.MkdirAll(ctx.Config.Dist, 0755)
+		return os.MkdirAll(ctx.Config.Dist, 0755)
 	}
 
-	return err
+	return pipe.Skip(fmt.Sprintf("%s already exists", ctx.Config.Dist))
 }

@@ -3,6 +3,7 @@ package archive
 import (
 	"compress/gzip"
 	"fmt"
+	"github.com/apex/log"
 	"github.com/campoy/unique"
 	"github.com/devster/tarreleaser/pkg/archive/targz"
 	"github.com/devster/tarreleaser/pkg/context"
@@ -11,7 +12,6 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/mattn/go-zglob"
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 	"os"
 	"path/filepath"
 	"strings"
@@ -20,7 +20,7 @@ import (
 type Pipe struct{}
 
 func (Pipe) String() string {
-	return "archive"
+	return "archiving"
 }
 
 func (Pipe) Default(ctx *context.Context) error {

@@ -2,13 +2,14 @@ package s3
 
 import (
 	"fmt"
+	"github.com/apex/log"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/devster/tarreleaser/pkg/context"
+	"github.com/devster/tarreleaser/pkg/pipe"
 	"github.com/devster/tarreleaser/pkg/tmpl"
-	log "github.com/sirupsen/logrus"
 	"os"
 	"path/filepath"
 )
@@ -16,7 +17,7 @@ import (
 type Pipe struct{}
 
 func (Pipe) String() string {
-	return "s3"
+	return "s3 publishing"
 }
 
 func (Pipe) Default(ctx *context.Context) error {
@@ -29,8 +30,7 @@ func (Pipe) Default(ctx *context.Context) error {
 
 func (Pipe) Run(ctx *context.Context) error {
 	if ctx.SkipPublish {
-		log.Debug("skipping publishing")
-		return nil
+		return pipe.ErrSkipPublishEnabled
 	}
 
 	if ctx.Config.Publish.S3.Bucket == "" {

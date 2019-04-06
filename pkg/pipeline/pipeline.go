@@ -2,12 +2,16 @@ package pipeline
 
 import (
 	"fmt"
+	"github.com/apex/log"
+	"github.com/apex/log/handlers/cli"
 	"github.com/devster/tarreleaser/pkg/context"
-	pkglog "github.com/devster/tarreleaser/pkg/log"
+	"github.com/devster/tarreleaser/pkg/pipe"
 	"github.com/devster/tarreleaser/pkg/pipe/archive"
 	"github.com/devster/tarreleaser/pkg/pipe/dist"
 	"github.com/devster/tarreleaser/pkg/pipe/gitinfo"
 	"github.com/devster/tarreleaser/pkg/pipe/s3"
+	"github.com/fatih/color"
+	"strings"
 )
 
 var Pipes = []Pipe{
@@ -27,23 +31,24 @@ type Pipe interface {
 func Run(ctx *context.Context) error {
 	// Run Defaults
 	for _, pipe := range Pipes {
-		pkglog.TextFormatter.Prefix = pipe.String()
-
 		if err := pipe.Default(ctx); err != nil {
 			return err
 		}
 	}
 
 	// Run pipes!
-	for _, pipe := range Pipes {
-		pkglog.TextFormatter.Prefix = pipe.String()
+	for _, p := range Pipes {
+		log.Info(color.New(color.Bold).Sprintf(strings.ToUpper(p.String())))
+		cli.Default.Padding = 6
+		if err := p.Run(ctx); err != nil {
+			if !pipe.IsSkip(err) {
+				return err
+			}
 
-		if err := pipe.Run(ctx); err != nil {
-			return err
+			log.WithError(err).Warn("pipe skipped")
 		}
+		cli.Default.Padding = 3
 	}
-
-	pkglog.TextFormatter.Prefix = ""
 
 	return nil
 }

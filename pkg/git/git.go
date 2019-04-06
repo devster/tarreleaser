@@ -2,7 +2,7 @@ package git
 
 import (
 	"errors"
-	log "github.com/sirupsen/logrus"
+	"github.com/apex/log"
 	"os/exec"
 	"strings"
 )
@@ -29,10 +29,11 @@ func Run(args ...string) (string, error) {
 	var cmd = exec.Command("git", args...)
 	log.WithField("args", args).Debug("running git")
 	bts, err := cmd.CombinedOutput()
-	log.WithField("output", string(bts)).Debug("git result")
+	out := strings.TrimSuffix(string(bts), "\n")
+	log.WithField("output", out).Debug("git result")
 	if err != nil {
-		return "", errors.New(strings.TrimSuffix(string(bts), "\n"))
+		return "", errors.New(out)
 	}
 
-	return strings.TrimSuffix(string(bts), "\n"), nil
+	return out, nil
 }
