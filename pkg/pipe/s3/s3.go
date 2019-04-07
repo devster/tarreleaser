@@ -34,8 +34,7 @@ func (Pipe) Run(ctx *context.Context) error {
 	}
 
 	if ctx.Config.Publish.S3.Bucket == "" {
-		log.Debug("skipping publish, no bucket configured")
-		return nil
+		return pipe.Skip("no bucket configured")
 	}
 
 	conf := ctx.Config.Publish.S3
