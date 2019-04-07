@@ -38,3 +38,7 @@ archive:
   format_overrides:
     - goos: windows
       format: zip
+release:
+  github:
+    owner: devster
+    name: tarreleaser

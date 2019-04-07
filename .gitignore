@@ -1,4 +1,6 @@
 tarreleaser
 .tarreleaser.yml
 coverage.txt
+goreleaser-dist/
 dist/
+bin/
