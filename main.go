@@ -31,6 +31,10 @@ type releaseOptions struct {
 }
 
 func main() {
+	// enable colored output on travis/circleci
+	if os.Getenv("CI") != "" {
+		color.NoColor = false
+	}
 	log.SetHandler(cli.Default)
 
 	// Cli app
