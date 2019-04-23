@@ -63,11 +63,11 @@ func (a Archive) Add(name, path string) error {
 }
 
 // Add file from content to the archive
-func (a Archive) AddFromString(name, content string) error {
+func (a Archive) AddFromString(name, content string, mode int64) error {
 	header := new(tar.Header)
 	header.Name = name
 	header.Size = int64(len(content))
-	header.Mode = 0644
+	header.Mode = mode
 	header.ModTime = time.Now()
 
 	if err := a.tw.WriteHeader(header); err != nil {

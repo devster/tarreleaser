@@ -100,6 +100,7 @@ func (Pipe) Run(ctx *context.Context) error {
 		return fmt.Errorf("failed to find files to archive: %s", err.Error())
 	}
 
+	// add files to archive
 	for _, f := range files {
 		name := filepath.Join(wrap, f)
 		log.Debugf("adding file: %s", f)
@@ -109,6 +110,19 @@ func (Pipe) Run(ctx *context.Context) error {
 		}
 	}
 
+	// add empty dirs to archive
+	for dir, mode := range ctx.Config.Archive.EmptyDirs {
+		dir = filepath.Join(wrap, dir)
+		// we add a trailing slash so tar.Header will know this is a directory
+		dir = fmt.Sprintf("%s/", strings.TrimSuffix(dir, "/"))
+		log.Debugf("adding empty dir with mode %v: %s", mode, dir)
+
+		if err = a.AddFromString(dir, "", mode); err != nil {
+			return fmt.Errorf("failed to add empty dir %s to the archive: %s", dir, err.Error())
+		}
+	}
+
+	// add release info file to archive
 	if err := addReleaseInfoFile(a, ctx, wrap); err != nil {
 		return errors.Wrap(err, "failed to add release file info")
 	}
@@ -202,5 +216,5 @@ func addReleaseInfoFile(a *targz.Archive, ctx *context.Context, wrap string) err
 		return err
 	}
 
-	return a.AddFromString(name, content)
+	return a.AddFromString(name, content, 0644)
 }

@@ -13,12 +13,13 @@ type ReleaseInfoFile struct {
 }
 
 type Archive struct {
-	Name             string          `yaml:",omitempty"`
-	CompressionLevel int             `yaml:"compression_level,omitempty"`
-	IncludeFiles     []string        `yaml:"includes,omitempty"`
-	ExcludeFiles     []string        `yaml:"excludes,omitempty"`
-	WrapInDirectory  string          `yaml:"wrap_in_directory,omitempty"`
-	InfoFile         ReleaseInfoFile `yaml:"info_file,omitempty"`
+	Name             string           `yaml:",omitempty"`
+	CompressionLevel int              `yaml:"compression_level,omitempty"`
+	IncludeFiles     []string         `yaml:"includes,omitempty"`
+	ExcludeFiles     []string         `yaml:"excludes,omitempty"`
+	WrapInDirectory  string           `yaml:"wrap_in_directory,omitempty"`
+	InfoFile         ReleaseInfoFile  `yaml:"info_file,omitempty"`
+	EmptyDirs        map[string]int64 `yaml:"empty_dirs,omitempty"`
 }
 
 type S3 struct {
