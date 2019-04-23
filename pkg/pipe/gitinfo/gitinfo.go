@@ -7,6 +7,7 @@ import (
 	"github.com/devster/tarreleaser/pkg/git"
 	"github.com/devster/tarreleaser/pkg/pipe"
 	"github.com/pkg/errors"
+	"os"
 )
 
 type Pipe struct{}
@@ -114,7 +115,18 @@ func getTag() (string, error) {
 }
 
 func getBranch() (string, error) {
-	return git.Run("rev-parse", "--abbrev-ref", "HEAD")
+	branch, err := git.Run("rev-parse", "--abbrev-ref", "HEAD")
+	if err != nil {
+		return "", err
+	}
+
+	// Provides consistent branch name on Travis
+	travisBranch := os.Getenv("TRAVIS_BRANCH")
+	if branch == "HEAD" && travisBranch != "" {
+		branch = travisBranch
+	}
+
+	return branch, nil
 }
 
 func validateTag(tag string) (err error) {
