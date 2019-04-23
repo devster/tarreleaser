@@ -71,7 +71,7 @@ func getInfo() (context.GitInfo, error) {
 
 	tag, err := getTag()
 	if err != nil {
-		log.WithError(err).Warn("Unable to retrieve the current tag")
+		log.WithError(err).Warn("No tags defined")
 	}
 
 	gitinfo := context.GitInfo{
@@ -83,6 +83,11 @@ func getInfo() (context.GitInfo, error) {
 			Author:  author,
 			Message: msg,
 		},
+	}
+
+	if err = validateTag(gitinfo.CurrentTag); err != nil {
+		log.Warnf("git tag %v was not made against commit %v, skipping tag", gitinfo.CurrentTag, gitinfo.FullCommit)
+		gitinfo.CurrentTag = ""
 	}
 
 	return gitinfo, nil
@@ -110,4 +115,12 @@ func getTag() (string, error) {
 
 func getBranch() (string, error) {
 	return git.Run("rev-parse", "--abbrev-ref", "HEAD")
+}
+
+func validateTag(tag string) (err error) {
+	if tag == "" {
+		return
+	}
+	_, err = git.Run("describe", "--exact-match", "--tags", "--match", tag)
+	return
 }
