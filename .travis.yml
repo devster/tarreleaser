@@ -4,6 +4,7 @@ go: '1.12.x'
 script:
   - make build
   - make test
+  - "! go fmt ./... 2>&1 | read"
   - ./tarreleaser init --debug
   - ./tarreleaser --skip-publish --debug
 
