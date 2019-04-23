@@ -9,6 +9,7 @@ import (
 	"github.com/devster/tarreleaser/pkg/pipe/archive"
 	"github.com/devster/tarreleaser/pkg/pipe/dist"
 	"github.com/devster/tarreleaser/pkg/pipe/gitinfo"
+	"github.com/devster/tarreleaser/pkg/pipe/output"
 	"github.com/devster/tarreleaser/pkg/pipe/s3"
 	"github.com/fatih/color"
 	"strings"
@@ -19,6 +20,7 @@ var Pipes = []Pipe{
 	dist.Pipe{},
 	archive.Pipe{},
 	s3.Pipe{},
+	output.Pipe{},
 }
 
 type Pipe interface {
@@ -38,7 +40,9 @@ func Run(ctx *context.Context) error {
 
 	// Run pipes!
 	for _, p := range Pipes {
-		log.Info(color.New(color.Bold).Sprintf(strings.ToUpper(p.String())))
+		if p.String() != "" {
+			log.Info(color.New(color.Bold).Sprintf(strings.ToUpper(p.String())))
+		}
 		cli.Default.Padding = 6
 		if err := p.Run(ctx); err != nil {
 			if !pipe.IsSkip(err) {

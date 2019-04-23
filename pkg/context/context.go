@@ -28,12 +28,13 @@ type Archive struct {
 
 type Context struct {
 	ctx.Context
-	Config      config.Project
-	Env         map[string]string
-	Git         GitInfo
-	Date        time.Time
-	Archive     Archive
-	SkipPublish bool
+	Config       config.Project
+	Env          map[string]string
+	Git          GitInfo
+	Date         time.Time
+	Archive      Archive
+	SkipPublish  bool
+	OutputFormat string
 }
 
 func NewWithTimeout(cfg config.Project, timeout time.Duration) (*Context, ctx.CancelFunc) {
