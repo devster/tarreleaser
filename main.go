@@ -25,9 +25,10 @@ var (
 const defaultConfigFile = ".tarreleaser.yml"
 
 type releaseOptions struct {
-	Config      string
-	SkipPublish bool
-	Timeout     time.Duration
+	Config       string
+	SkipPublish  bool
+	Timeout      time.Duration
+	OutputFormat string
 }
 
 func main() {
@@ -50,6 +51,7 @@ func main() {
 	releaseCmd.Flag("config", "Load configuration from file").Short('c').Default(defaultConfigFile).StringVar(&rOptions.Config)
 	releaseCmd.Flag("skip-publish", "Skips publishing artifacts").Short('s').BoolVar(&rOptions.SkipPublish)
 	releaseCmd.Flag("timeout", "Timeout to the entire release process").Default("30m").DurationVar(&rOptions.Timeout)
+	releaseCmd.Flag("output", "Format the output. Ex: -o '{{.Archive.Name}}'").Short('o').StringVar(&rOptions.OutputFormat)
 
 	// Init config file cli command
 	initCmd := app.Command("init", fmt.Sprintf("Generate a %v file", defaultConfigFile))
@@ -92,6 +94,7 @@ func releaseProject(options releaseOptions) error {
 	ctx, cancel := context.NewWithTimeout(cfg, options.Timeout)
 	defer cancel()
 	ctx.SkipPublish = options.SkipPublish
+	ctx.OutputFormat = options.OutputFormat
 
 	return ctrlc.Default.Run(ctx, func() error {
 		return pipeline.Run(ctx)

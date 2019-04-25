@@ -25,6 +25,7 @@ func New(ctx *context.Context) *Template {
 			"Date":        ctx.Date.Format(time.RFC3339),
 			"Timestamp":   ctx.Date.Unix(),
 			"Env":         ctx.Env,
+			"Archive":     ctx.Archive,
 		},
 	}
 }
