@@ -1,5 +1,4 @@
 export GO111MODULE := on
-export GOPROXY := https://gocenter.io
 
 .DEFAULT_GOAL := build
 
@@ -21,3 +20,6 @@ cover: test
 fmt:
 	go fmt ./...
 .PHONY: fmt
+
+release:
+	curl -sfL https://goreleaser.com/static/run | bash -s -- release
